@@ -1,2 +1,18 @@
-A sample command-line application with an entrypoint in `bin/`, library code
-in `lib/`, and example unit test in `test/`.
+# PEMMOB_GANJIL_2026
+
+Repository tugas mata kuliah Pemrograman Mobile.
+
+## Struktur Repository
+
+- Week 1
+  - Pembelajaran dasar Dart
+  - Source code dan dokumentasi
+
+## Teknologi
+
+- Dart
+- Flutter (akan dipelajari selanjutnya)
+
+## Author
+
+Siti Mutmainah
