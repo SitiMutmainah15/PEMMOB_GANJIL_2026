@@ -1,22 +1,20 @@
 class Lirik {
-  String judul;
-  String lirikLagu;
-  String artis;
+  final String judul;
+  final String lirikLagu;
+  final String artis;
 
-  Lirik({
+  const Lirik({
     required this.judul,
-    required this.artis,
     required this.lirikLagu,
+    required this.artis,
   });
 
-  void tampilkanInfo() {
-    print('Judul Lagu: $judul');
-    print('Lirik Lagu: $lirikLagu');
-    print('Artis: $artis');
-  }
+  String tampilkanInfo() => '$judul - $artis';
 }
 
-final Lirik lagBertaut = Lirik(
+// Jika lirik.dart lama kamu sudah lengkap, kamu boleh mengganti isi lirik di bawah
+// dengan isi lirik milikmu sendiri.
+const Lirik lagBertaut = Lirik(
   judul: 'Bertaut',
   artis: 'Nadin Amizah',
   lirikLagu: '''
