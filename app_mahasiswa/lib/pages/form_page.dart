@@ -1,35 +1,65 @@
 import 'package:flutter/material.dart';
+
 import '../models/mahasiswa.dart';
-import '../services/api_service.dart';
- 
+import '../data/api_client.dart';
+import '../data/repository/mahasiswa_repository.dart';
+
 class FormPage extends StatefulWidget {
   // null = mode tambah, terisi = mode edit
   final Mahasiswa? mahasiswa;
-  const FormPage({super.key, this.mahasiswa});
- 
+
+  const FormPage({
+    super.key,
+    this.mahasiswa,
+  });
+
   @override
   State<FormPage> createState() => _FormPageState();
 }
+
 class _FormPageState extends State<FormPage> {
   final _formKey = GlobalKey<FormState>();
-  final api = ApiService();
-  late final TextEditingController nimC, namaC,
-      prodiC, emailC;
+
+  late final MahasiswaRepository repository;
+
+  late final TextEditingController nimC;
+  late final TextEditingController namaC;
+  late final TextEditingController prodiC;
+  late final TextEditingController emailC;
+
   bool _loading = false;
- 
+
   bool get isEdit => widget.mahasiswa != null;
- 
+
   @override
   void initState() {
     super.initState();
-    // isi awal form (kosong jika mode tambah)
+
+    // Repository menggunakan Dio
+    repository = MahasiswaRepository(
+      createDio(),
+    );
+
+    // Isi awal form
     final m = widget.mahasiswa;
-    nimC = TextEditingController(text: m?.nim);
-    namaC = TextEditingController(text: m?.nama);
-    prodiC = TextEditingController(text: m?.prodi);
-    emailC = TextEditingController(text: m?.email);
+
+    nimC = TextEditingController(
+      text: m?.nim,
+    );
+
+    namaC = TextEditingController(
+      text: m?.nama,
+    );
+
+    prodiC = TextEditingController(
+      text: m?.prodi,
+    );
+
+    emailC = TextEditingController(
+      text: m?.email,
+    );
   }
- 
+
   @override
   void dispose() {
     nimC.dispose();
@@ -38,54 +68,93 @@ class _FormPageState extends State<FormPage> {
     emailC.dispose();
     super.dispose();
   }
+
   Future<void> _simpan() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _loading = true);
- 
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+    });
+
     final data = Mahasiswa(
       nim: nimC.text.trim(),
       nama: namaC.text.trim(),
       prodi: prodiC.text.trim(),
       email: emailC.text.trim(),
     );
- 
+
     try {
       if (isEdit) {
-        await api.update(widget.mahasiswa!.id!, data);
+        // PUT
+        await repository.update(
+          widget.mahasiswa!.id!,
+          data,
+        );
       } else {
-        await api.create(data);
+        // POST
+        await repository.create(data);
       }
+
       if (!mounted) return;
-      // kirim "true" ke halaman list
+
+      // Memberi tahu halaman list bahwa data berubah
       Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('$e')));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Gagal menyimpan data: $e',
+          ),
+        ),
+      );
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
   }
-  Widget _field(TextEditingController c, String label) {
+
+  Widget _field(
+    TextEditingController controller,
+    String label,
+  ) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(
+        bottom: 12,
+      ),
       child: TextFormField(
-        controller: c,
+        controller: controller,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
         ),
-        validator: (v) => (v == null || v.trim().isEmpty)
-            ? '$label wajib diisi'
-            : null,
+        validator: (value) {
+          if (value == null ||
+              value.trim().isEmpty) {
+            return '$label wajib diisi';
+          }
+
+          return null;
+        },
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEdit ? 'Edit Mahasiswa' : 'Tambah Mahasiswa'),
+        title: Text(
+          isEdit
+              ? 'Edit Mahasiswa'
+              : 'Tambah Mahasiswa',
+        ),
       ),
       body: Form(
         key: _formKey,
@@ -96,13 +165,20 @@ class _FormPageState extends State<FormPage> {
             _field(namaC, 'Nama'),
             _field(prodiC, 'Prodi'),
             _field(emailC, 'Email'),
+
             const SizedBox(height: 8),
+
             FilledButton(
-              onPressed: _loading ? null : _simpan,
+              onPressed:
+                  _loading ? null : _simpan,
               child: _loading
                   ? const SizedBox(
-                      width: 20, height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      width: 20,
+                      height: 20,
+                      child:
+                          CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
                     )
                   : const Text('Simpan'),
             ),
