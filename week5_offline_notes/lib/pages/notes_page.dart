@@ -1,3 +1,6 @@
+import '../data/sync.dart';
+import 'posts_page.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
  
@@ -52,6 +55,29 @@ class NotesPage extends ConsumerWidget {
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const SettingsPage()),
             ),
+          ), IconButton(
+            tooltip: 'Posts (cache-first)',
+            icon: const Icon(Icons.article_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PostsPage()),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Sinkronkan',
+            icon: const Icon(Icons.sync),
+            onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              try {
+                final count = await ref.read(noteActionsProvider).sync();
+                messenger.showSnackBar(SnackBar(
+                  content: Text(count == 0
+                      ? 'Semua catatan sudah tersinkron'
+                      : '$count catatan berhasil disinkronkan'),
+                ));
+              } on OfflineException catch (e) {
+                messenger.showSnackBar(SnackBar(content: Text(e.message)));
+              }
+            },
           ),
         ],
       ),

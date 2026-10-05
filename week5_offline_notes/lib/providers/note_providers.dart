@@ -1,3 +1,6 @@
+import '../data/sync.dart';
+import 'offline_providers.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
  
 import '../data/local/note.dart';
@@ -43,5 +46,12 @@ class NoteActions {
   void _refresh() {
     _ref.invalidate(notesProvider);
     _ref.invalidate(dirtyCountProvider);
+  }
+
+    Future<int> sync() async {
+    final offline = _ref.read(forceOfflineProvider);
+    final count = await syncNotes(_repo, offline: offline);
+    _refresh();
+    return count;
   }
 }
