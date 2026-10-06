@@ -12,6 +12,10 @@ final notesProvider = FutureProvider<List<Note>>(
   (ref) => ref.watch(noteRepositoryProvider).fetchNotes(),
 );
 
+final noteByIdProvider = FutureProvider.family<Note?, int>(
+  (ref, id) => ref.watch(noteRepositoryProvider).getNoteById(id),
+);
+
 final dirtyCountProvider = FutureProvider<int>(
   (ref) => ref.watch(noteRepositoryProvider).countDirty(),
 );
@@ -19,9 +23,6 @@ final dirtyCountProvider = FutureProvider<int>(
 final noteActionsProvider =
     Provider<NoteActions>((ref) => NoteActions(ref));
 
-/// Kumpulan aksi yang mengubah data.
-/// Setiap mutasi diakhiri invalidate agar notes dan dirty count
-/// dimuat ulang dari database.
 class NoteActions {
   NoteActions(this._ref);
 
@@ -35,21 +36,25 @@ class NoteActions {
       title: title,
       body: body,
     );
+
     _refresh();
   }
 
   Future<void> update(Note note) async {
     await _repo.updateNote(note);
+
     _refresh();
   }
 
   Future<void> delete(int id) async {
     await _repo.deleteNote(id);
+
     _refresh();
   }
 
   Future<int> sync() async {
-    final offline = _ref.read(forceOfflineProvider);
+    final offline =
+        _ref.read(forceOfflineProvider);
 
     final count = await syncNotes(
       _repo,
