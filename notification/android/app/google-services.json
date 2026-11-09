@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "971949491834",
+    "project_id": "notification-3e3fc",
+    "storage_bucket": "notification-3e3fc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:971949491834:android:293ceac50919ad75f85dc3",
+        "android_client_info": {
+          "package_name": "id.ac.polinema.campus_notify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAOx2r1DfAQk7O7B0fzNd0x_089ibw14U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
